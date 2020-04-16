@@ -38,7 +38,7 @@ export default class Worker extends Base {
    * worker.register('tasks.add', (a, b) => a + b);
    * worker.start();
    */
-  public start(): Promise<any> {
+  public start(queue: "celery"): Promise<any> {
     console.info("celery.node worker start...");
     console.info(`registed task: ${Object.keys(this.handlers)}`);
     return this.run().catch(err => console.error(err));
@@ -50,7 +50,7 @@ export default class Worker extends Base {
    *
    * @returns {Promise}
    */
-  private run(queue: "celery"): Promise<any> {
+  private run(queue: string): Promise<any> {
     return this.isReady().then(() => this.processTasks(queue));
   }
 
