@@ -1,15 +1,15 @@
 {
-  "name": "celery-node",
-  "version": "0.3.1",
+  "name": "@sandrosalles/celery-node",
+  "version": "0.3.2",
   "description": "celery written in nodejs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "lint": "./node_modules/.bin/eslint src test --ext .js,.ts",
+    "lint": "eslint src test --ext .js,.ts",
     "format": "prettier --write \"{,!(node_modules)/**/}*.{js,ts}\"",
     "format-check": "prettier --check \"{,!(node_modules)/**/}*.{js,ts}\"",
     "dist": "tsc",
-    "test": "./node_modules/.bin/mocha"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
@@ -56,5 +56,9 @@
     "amqplib": "^0.5.5",
     "ioredis": "^4.14.0",
     "uuid": "^3.3.2"
+  },
+  "directories": {
+    "example": "examples",
+    "test": "test"
   }
 }

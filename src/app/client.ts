@@ -1,8 +1,9 @@
-import { v4 } from "uuid";
-import { CeleryConf, DEFAULT_CELERY_CONF } from "./conf";
-import Base from "./base";
-import Task from "./task";
-import { AsyncResult } from "./result";
+import { CeleryConf, DEFAULT_CELERY_CONF } from './conf'
+
+import { AsyncResult } from './result'
+import Base from './base'
+import Task from './task'
+import { v4 } from 'uuid'
 
 class TaskMessage {
   constructor(
@@ -16,24 +17,28 @@ class TaskMessage {
 export default class Client extends Base {
   private taskProtocols = {
     1: this.asTaskV1,
-    2: this.asTaskV2
-  };
-
-  get createTaskMessage(): (...args: any[]) => TaskMessage {
-    return this.taskProtocols[this.conf.TASK_PROTOCOL];
+    2: this.asTaskV2,
   }
 
-  public sendTaskMessage(taskName: string, message: TaskMessage): void {
-    const { headers, properties, body, sentEvent } = message;
+  get createTaskMessage(): (...args: any[]) => TaskMessage {
+    return this.taskProtocols[this.conf.TASK_PROTOCOL]
+  }
 
-    const exchange = "";
+  public sendTaskMessage(
+    taskName: string,
+    message: TaskMessage,
+    routingKey?: 'celery'
+  ): void {
+    const { headers, properties, body, sentEvent } = message
+
+    const exchange = ''
     // exchangeType = 'direct';
-    const routingKey = "celery";
+
     // const serializer = 'json';
 
     this.isReady().then(() =>
       this.broker.publish(body, exchange, routingKey, headers, properties)
-    );
+    )
   }
 
   public asTaskV2(
@@ -44,9 +49,9 @@ export default class Client extends Base {
   ): TaskMessage {
     const message: TaskMessage = {
       headers: {
-        lang: "js",
+        lang: 'js',
         task: taskName,
-        id: taskId
+        id: taskId,
         /*
         'shadow': shadow,
         'eta': eta,
@@ -63,13 +68,13 @@ export default class Client extends Base {
       },
       properties: {
         correlationId: taskId,
-        replyTo: ""
+        replyTo: '',
       },
       body: [args, kwargs, {}],
-      sentEvent: null
-    };
+      sentEvent: null,
+    }
 
-    return message;
+    return message
   }
 
   /**
@@ -92,18 +97,18 @@ export default class Client extends Base {
       headers: {},
       properties: {
         correlationId: taskId,
-        replyTo: ""
+        replyTo: '',
       },
       body: {
         task: taskName,
         id: taskId,
         args: args,
-        kwargs: kwargs
+        kwargs: kwargs,
       },
-      sentEvent: null
-    };
+      sentEvent: null,
+    }
 
-    return message;
+    return message
   }
 
   /**
@@ -116,20 +121,21 @@ export default class Client extends Base {
    * client.createTask('task.add').delay([1, 2])
    */
   public createTask(name: string): Task {
-    return new Task(this, name);
+    return new Task(this, name)
   }
 
   public sendTask(
     taskName: string,
     args?: Array<any>,
     kwargs?: object,
-    taskId?: string
+    taskId?: string,
+    routingKey?: 'celery'
   ): AsyncResult {
-    taskId = taskId || v4();
-    const message = this.createTaskMessage(taskId, taskName, args, kwargs);
-    this.sendTaskMessage(taskName, message);
+    taskId = taskId || v4()
+    const message = this.createTaskMessage(taskId, taskName, args, kwargs)
+    this.sendTaskMessage(taskName, message, routingKey)
 
-    const result = new AsyncResult(taskId, this.backend);
-    return result;
+    const result = new AsyncResult(taskId, this.backend)
+    return result
   }
 }
