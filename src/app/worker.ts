@@ -50,8 +50,8 @@ export default class Worker extends Base {
    *
    * @returns {Promise}
    */
-  private run(): Promise<any> {
-    return this.isReady().then(() => this.processTasks());
+  private run(queue: "celery"): Promise<any> {
+    return this.isReady().then(() => this.processTasks(queue));
   }
 
   /**
@@ -60,8 +60,8 @@ export default class Worker extends Base {
    *
    * @returns function results
    */
-  private processTasks(): Promise<any> {
-    const consumer = this.getConsumer("celery");
+  private processTasks(queue: string): Promise<any> {
+    const consumer = this.getConsumer(queue);
     return consumer();
   }
 
